@@ -7,7 +7,7 @@ clc; clear all; close all;
 % (DEGREE_END - DEGREE_START + 1) = N*DEGREE_INTERVAL where N is an integer.
 NUM_LOOP = 1; 
 DEGREE_START = 0;   
-DEGREE_END = 359;
+DEGREE_END = 0;
 DEGREE_INTERVAL = 45;
 CROP_SIZE = 150; % Size of each generated defect image (Even number)
 
@@ -20,8 +20,9 @@ img_dir = dir([pathd '*.jpg']);
 % Read the image of the perfect contact
 for d = 1:num_imgs          % Count for number of perfect images to read
     img_obj = img_dir(d);   % Read No.d image object
-    img_ori = imread([pathd img_obj.name]);
-    [img_size_y img_size_x img_size_z] = size(img_ori); 
+    img_ori_rgb = imread([pathd img_obj.name]);
+    img_ori = rgb2gray(img_ori_rgb);
+    [img_size_y img_size_x] = size(img_ori); 
     % figure, imshow(img_ori); % Test for img_ori 
     
     % Find the center of the lense in a given perfect image
@@ -69,16 +70,38 @@ for d = 1:num_imgs          % Count for number of perfect images to read
         elseif CROP_IMG_Y < 0
             CROP_IMG_Y = 0;
         end
+%         %% Generate defect on the edge
+%         if j <= 45 || (j < 360 && j >= 315)
+%             for y = (CROP_IMG_Y+START_POINT) : (CROP_IMG_Y+END_POINT)
+%                 % Calculate difference
+%                 for x = (CROP_IMG_X+1-1) : (CROP_IMG_X+149-1)
+%                     Diff(x) = img_ori(y,x+1) - img_ori(y,x);  
+%                 end 
+%             
+%                 
+%                 
+%             end % y
+%         else
+%             
+%         end
+        
+        
+        
+        
         
         % Crop a CROP_SIZExCROP_SIZE image from the original image
         img_crop = imcrop(img_ori,[CROP_IMG_X CROP_IMG_Y 149 149]);
         figure, imshow(img_crop);
-        bbox = [CROP_IMG_X CROP_IMG_Y 149 149];
+        % Test: comparing the img_crop and img_ori
+        % bbox_test = [CROP_IMG_X CROP_IMG_Y 149 149];
+        % img_test = insertShape(img_ori,'Rectangle',bbox,'LineWidth',2, 'Color', 'yellow');
+        % figure, imshow(img_test); 
         
-        img_test = insertShape(img_ori,'Rectangle',bbox,'LineWidth',2, 'Color', 'yellow');
-        figure, imshow(img_test); 
+
         
         
+         
+            
         end % j
     end % i
 
