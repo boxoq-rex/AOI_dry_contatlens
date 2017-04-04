@@ -9,7 +9,7 @@ NUM_LOOP = 1;
 DEGREE_START = 0;   
 DEGREE_END = 44;
 DEGREE_INTERVAL = 1;
-CROP_SIZE = 150; % Size of each generated defect image
+CROP_SIZE = 150; % Size of each generated defect image (Even number)
 
 %% Read perfect contact lense image
 % Write the path of the image
@@ -21,6 +21,7 @@ img_dir = dir([pathd '*.jpg']);
 for d = 1:num_imgs          % Count for number of perfect images to read
     img_obj = img_dir(d);   % Read No.d image object
     img_ori = imread([pathd img_obj.name]);
+    [img_size_x img_size_y img_size_z] = size(img_ori); 
     % figure, imshow(img_ori); % Test for img_ori 
     
     % Find the center of the lense in a given perfect image
@@ -41,8 +42,26 @@ for d = 1:num_imgs          % Count for number of perfect images to read
         end
         START_POINT = unidrnd(END_POINT-1,1,1);    
             
-            
-            
+        % Crop CROP_SIZExCROP_SIZE-images from img_ori
+        % For example, 150x150-image
+        
+        % Definition of BBOX coordination
+        CROP_IMG_X = xc + rc*cos(2*pi*j/360) - CROP_SIZE/2;
+        CROP_IMG_Y = yc - rc*sin(2*pi*j/360) - CROP_SIZE/2;
+        % Modification for out-of-range situation
+        ORI_IMG_X = img_size_x; % haven't define yet ***
+        ORI_IMG_Y = img_size_y; % haven't define yet ***
+        EDGE_DEL_X = abs(CROP_IMG_X + CROP_SIZE - ORI_IMG_X);
+        EDGE_DEL_Y = abs(CROP_IMG_Y + CROP_SIZE - ORI_IMG_Y);
+        
+        %Test
+        CROP_IMG_X = 2000;
+        
+        if CROP_IMG_X + CROP_SIZE > ORI_IMG_X
+            CROP_IMG_X = CROP_IMG_X - EDGE_DEL_X;
+        elseif CROP_IMG_X < 0
+            CROP_IMG_X = 0;
+        end
             
         end % j
     end % i
