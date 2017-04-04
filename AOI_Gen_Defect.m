@@ -76,52 +76,52 @@ for d = 1:num_imgs          % Count for number of perfect images to read
             for y = START_POINT : END_POINT 
                 % Start to check from the points within the circle
                 if abs(floor(CROP_IMG_Y) - yc) <= rc
-                    x_defect_start = floor(sqrt(rc^2-(floor(CROP_IMG_Y) - yc)^2) + xc);
-                    %Random number of edge pixel
-                    EDGE_NUM = 4 + unidrnd(3,1,1);
-                
+                    % x position given y position
+                    x_defect_start = 4 + floor(sqrt(rc^2-(floor(CROP_IMG_Y) - yc)^2) + xc);
+                    
+                    % Random number of edge pixel
+                    EDGE_NUM = 2 + unidrnd(2,1,1);
+                    
+                    % Generate pattern on the edge
                     for x = x_defect_start : x_defect_start+EDGE_NUM-1
                         RANGE = x;
-                        if RANGE > CROP_SIZE 
+                        if RANGE - CROP_IMG_X > CROP_SIZE 
                             RANGE = CROP_SIZE;
-                        elseif RANGE < 0 
+                        elseif RANGE - CROP_IMG_X < 0 
                             RANGE = 1;
                         end
                     
-                        img_SIM(floor(CROP_IMG_Y)+y,RANGE) = 120+ unidrnd(25,1,1);
-                    
+                        img_SIM(floor(CROP_IMG_Y)+y,RANGE) = 135+ unidrnd(15,1,1);
+                        
                     end % x
-                
+                    MIN_POINT(y-START_POINT+1) = x_defect_start;
+                    MAX_POINT(y-START_POINT+1) = x_defect_start+EDGE_NUM-1;
                 
                 end % if    
                 
             end % y
             
+            
             % Create bbox
-            bbox_x_0 = 0;
+            bbox_x_0 = min(MIN_POINT);
             bbox_y_0 = floor(CROP_IMG_Y) + START_POINT;
-            bbox_x_1 = 500;
+            bbox_x_1 = max(MAX_POINT);
             bbox_y_1 = floor(CROP_IMG_Y) + END_POINT;
-            bbox_test = [bbox_x_0 bbox_y_0 bbox_x_1-bbox_x_0 bbox_y_1-bbox_y_0];
-            img_test = insertShape(img_ori,'Rectangle',bbox_test,'LineWidth',2, 'Color', 'yellow');
-            figure, imshow(img_test);
             
         else
             
         end
-        
-        
-        
-        
+  
         
         % Crop a CROP_SIZExCROP_SIZE image from the original image
-%         img_crop = imcrop(img_ori,[CROP_IMG_X CROP_IMG_Y 149 149]);
-%         figure, imshow(img_crop);
-        % Test: comparing the img_crop and img_ori
-        % bbox_test = [CROP_IMG_X CROP_IMG_Y 149 149];
-        % img_test = insertShape(img_ori,'Rectangle',bbox,'LineWidth',2, 'Color', 'yellow');
-        % figure, imshow(img_test); 
-        
+        img_crop = imcrop(img_SIM,[CROP_IMG_X CROP_IMG_Y 149 149]);
+        figure, imshow(img_crop);
+        %Test: comparing the img_crop and img_ori
+        bbox_test = [bbox_x_0-CROP_IMG_X bbox_y_0-CROP_IMG_Y bbox_x_1-bbox_x_0 bbox_y_1-bbox_y_0];
+        img_test = insertShape(img_crop,'Rectangle',bbox_test,'LineWidth',1, 'Color', 'yellow');
+        figure, imshow(img_test); 
+        write_file = strcat(sprintf('%06d',1));
+        imwrite(img_crop, [write_file,'.png']);
 
         
         
