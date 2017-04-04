@@ -70,28 +70,53 @@ for d = 1:num_imgs          % Count for number of perfect images to read
         elseif CROP_IMG_Y < 0
             CROP_IMG_Y = 0;
         end
-%         %% Generate defect on the edge
-%         if j <= 45 || (j < 360 && j >= 315)
-%             for y = (CROP_IMG_Y+START_POINT) : (CROP_IMG_Y+END_POINT)
-%                 % Calculate difference
-%                 for x = (CROP_IMG_X+1-1) : (CROP_IMG_X+149-1)
-%                     Diff(x) = img_ori(y,x+1) - img_ori(y,x);  
-%                 end 
-%             
-%                 
-%                 
-%             end % y
-%         else
-%             
-%         end
+        %% Generate defect on the edge
+        img_SIM = img_ori;
+        if j <= 45 || (j < 360 && j >= 315)
+            for y = START_POINT : END_POINT 
+                % Start to check from the points within the circle
+                if abs(floor(CROP_IMG_Y) - yc) <= rc
+                    x_defect_start = floor(sqrt(rc^2-(floor(CROP_IMG_Y) - yc)^2) + xc);
+                    %Random number of edge pixel
+                    EDGE_NUM = 4 + unidrnd(3,1,1);
+                
+                    for x = x_defect_start : x_defect_start+EDGE_NUM-1
+                        RANGE = x;
+                        if RANGE > CROP_SIZE 
+                            RANGE = CROP_SIZE;
+                        elseif RANGE < 0 
+                            RANGE = 1;
+                        end
+                    
+                        img_SIM(floor(CROP_IMG_Y)+y,RANGE) = 120+ unidrnd(25,1,1);
+                    
+                    end % x
+                
+                
+                end % if    
+                
+            end % y
+            
+            % Create bbox
+            bbox_x_0 = 0;
+            bbox_y_0 = floor(CROP_IMG_Y) + START_POINT;
+            bbox_x_1 = 500;
+            bbox_y_1 = floor(CROP_IMG_Y) + END_POINT;
+            bbox_test = [bbox_x_0 bbox_y_0 bbox_x_1-bbox_x_0 bbox_y_1-bbox_y_0];
+            img_test = insertShape(img_ori,'Rectangle',bbox_test,'LineWidth',2, 'Color', 'yellow');
+            figure, imshow(img_test);
+            
+        else
+            
+        end
         
         
         
         
         
         % Crop a CROP_SIZExCROP_SIZE image from the original image
-        img_crop = imcrop(img_ori,[CROP_IMG_X CROP_IMG_Y 149 149]);
-        figure, imshow(img_crop);
+%         img_crop = imcrop(img_ori,[CROP_IMG_X CROP_IMG_Y 149 149]);
+%         figure, imshow(img_crop);
         % Test: comparing the img_crop and img_ori
         % bbox_test = [CROP_IMG_X CROP_IMG_Y 149 149];
         % img_test = insertShape(img_ori,'Rectangle',bbox,'LineWidth',2, 'Color', 'yellow');
