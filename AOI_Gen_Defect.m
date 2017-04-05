@@ -5,10 +5,10 @@ clc; clear all; close all;
 % Number of generated images = 
 % NUM_LOOP*(DEGREE_END-DEGREE_START)/DEGREE_INTERVAL
 % (DEGREE_END - DEGREE_START + 1) = N*DEGREE_INTERVAL where N is an integer.
-NUM_LOOP = 1; 
+NUM_LOOP = 2; 
 DEGREE_START = 0;   
-DEGREE_END = 0;
-DEGREE_INTERVAL = 45;
+DEGREE_END = 44;
+DEGREE_INTERVAL = 1;
 CROP_SIZE = 150; % Size of each generated defect image (Even number)
 
 %% Read perfect contact lense image
@@ -73,14 +73,19 @@ for d = 1:num_imgs          % Count for number of perfect images to read
         %% Generate defect on the edge
         img_SIM = img_ori;
         if j <= 45 || (j < 360 && j >= 315)
+            
+            MIN_POINT = zeros(1,END_POINT-START_POINT+1);
+            MAX_POINT = zeros(1,END_POINT-START_POINT+1);   
+            
             for y = START_POINT : END_POINT 
                 % Start to check from the points within the circle
-                if abs(floor(CROP_IMG_Y) - yc) <= rc
+                if abs(floor(CROP_IMG_Y)+y - yc) <= rc
                     % x position given y position
-                    x_defect_start = 4 + floor(sqrt(rc^2-(floor(CROP_IMG_Y) - yc)^2) + xc);
+                    x_defect_start = 2 + floor(sqrt(rc^2-(floor(CROP_IMG_Y)+y - yc)^2) + xc);
                     
                     % Random number of edge pixel
-                    EDGE_NUM = 2 + unidrnd(2,1,1);
+                    % EDGE_NUM = 2 + unidrnd(2,1,1);
+                    EDGE_NUM = 3;
                     
                     % Generate pattern on the edge
                     for x = x_defect_start : x_defect_start+EDGE_NUM-1
@@ -91,11 +96,11 @@ for d = 1:num_imgs          % Count for number of perfect images to read
                             RANGE = 1;
                         end
                     
-                        img_SIM(floor(CROP_IMG_Y)+y,RANGE) = 90+ unidrnd(15,1,1);
+                        img_SIM(floor(CROP_IMG_Y)+y,RANGE) = 125+ unidrnd(15,1,1);
                         
                     end % x
-                    MIN_POINT(y-START_POINT+1) = x_defect_start;
-                    MAX_POINT(y-START_POINT+1) = x_defect_start+EDGE_NUM-1;
+                    MIN_POINT(1,y-START_POINT+1) = x_defect_start;
+                    MAX_POINT(1,y-START_POINT+1) = x_defect_start+EDGE_NUM-1;
                 
                 end % if    
                 
@@ -119,8 +124,8 @@ for d = 1:num_imgs          % Count for number of perfect images to read
         bbox_test = [bbox_x_0-CROP_IMG_X+1 bbox_y_0-CROP_IMG_Y+1 bbox_x_1-bbox_x_0+1 bbox_y_1-bbox_y_0+1];
         img_test = insertShape(img_crop,'Rectangle',bbox_test,'LineWidth',1, 'Color', 'yellow');
         figure, imshow(img_test); 
-        write_file = strcat(sprintf('%06d',1));
-        imwrite(img_crop, [write_file,'.png']);
+%         write_file = strcat(sprintf('%06d',1));
+%         imwrite(img_crop, [write_file,'.png']);
 
         
         
